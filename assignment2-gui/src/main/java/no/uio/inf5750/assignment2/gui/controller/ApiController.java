@@ -24,7 +24,6 @@ import no.uio.inf5750.assignment2.service.StudentSystem;
 @Controller
 @RequestMapping("/api")
 public class ApiController {
-	@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
 	
 	
 	static Logger logger = Logger.getLogger(ApiController.class);

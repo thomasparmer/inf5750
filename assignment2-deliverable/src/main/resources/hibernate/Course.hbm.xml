@@ -12,11 +12,11 @@
 
 		</id>
 		
-		<property name="courseCode" /> <!-- unique="true" not-null="true" />
-		-->
-		<property name="name" /> <!--  not-null="true" /> -->
+		<property name="courseCode" not-null="true" />
+		
+		<property name="name"  not-null="true" />
 
-		<set name="attendants" table="attendants">
+		<set name="attendants" table="studentCourses" cascade="save-update">
 			<key column="courseID" />
 			<many-to-many column="studentID"
 				class="no.uio.inf5750.assignment2.model.Student" />

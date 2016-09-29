@@ -111,16 +111,6 @@ html,body {
 		initialize_map();
 	});
 	</script>
-	<!-- 
-	<script>
-	$(document).ready(function() {
-		initialize_map();
-	});
-	</script>
-	 -->
-
-
-	
 
 <div id="map-canvas" class="container map"></div>
 </body>

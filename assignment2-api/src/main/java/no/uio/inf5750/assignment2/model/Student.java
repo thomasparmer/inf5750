@@ -92,11 +92,11 @@ public class Student {
 		this.name = name;
 	}
 
-	/*public Set<Course> getCourses() {
+	public Set<Course> getCourses() {
 		courses = new HashSet<Course>( courses ); // Rehash hack
 
 		return courses;
-	}*/
+	}
 
 	public void setCourses(Set<Course> courses) {
 		this.courses = courses;

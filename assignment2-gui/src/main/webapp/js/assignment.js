@@ -4,22 +4,18 @@ function getStudentData() {
 	// You must first download the student json data from the server
 	// then call populateStudentTable(json);
 	// and then populateStudentLocationForm(json);
-
-	$.ajax({
-		url : 'http://localhost:8080/assignment2-gui/api/student',
-		type : 'GET',
-		dataType : 'json',
-		success : function(json) {
-			console.log(json)
-			populateStudentTable(json);
-			populateStudentLocationForm(json);
-		}
+	console.log("getStudentData log");
+	$.getJSON("/api/student.json", function(json) {
+		populateStudentTable(json);
+		populateStudentLocationForm(json);
 	});
-
 }
 
 function populateStudentTable(json) {
-	console.log("populateStudentTable");
+	//console.log("thomas");
+	console.log(json);
+	$('#studentTable').empty();
+	
 	// for each student make a row in the student location table
 	// and show the name, all courses and location.
 	// if there is no location print "No location" in the <td> instead
@@ -29,25 +25,37 @@ function populateStudentTable(json) {
 
 	// the table can you see in index.jsp with id="studentTable"
 
-	var text = '';
 	for (var i = 0; i < json.length; i++) {
+		var text = '';
 		var student = json[i];
 		student = explodeJSON(student);
-		text += '<tr class="populateStudentTable"><td>' + student.name + '</td>';
-
-		var courseText = '';
+		console.log("populate student 1");
+		console.log(student + " hello!!! ");
+		text += '<tr><td>' + student.name + '</td><td>';
+        alert(text);
+		
 		for (var j = 0; j < student.courses.length; j++) {
-			courseText += student.courses[j].courseCode + " ";
+			var course = student.courses[j];
+			course = explodeJSON(course);
+			text += course.courseCode + " ";
+			alert("22  " + text);
+			
+		}
+		
+		console.log("populate student 2");
+		if ( student.latitude != null && student.longitude != null) {
+		text += '</td><td>' + student.latitude + ', ' + student.longitude
+				+ '</td></tr>';
+		} else {
+			console.log("populate student 3");
+			text += '</td><td>no location</td></tr>';
 		}
 
-		text += '<td>' + courseText + '</td>';
-		text += '<td>' + student.latitude + ',' + student.longitude
-				+ '</td></tr>';
-		add_marker(student.latitude, student.longitude, student.name);
+		$('#studentTable').append(text);
 	}
-
-	$('#studentTable').append(formString);
 }
+
+
 
 function populateStudentLocationForm(json) {
 	var formString = '<tr><td><select id="selectedStudent" name="students">';
@@ -58,7 +66,6 @@ function populateStudentLocationForm(json) {
 				+ '</option>';
 	}
 	formString += '</select></td></tr>';
-
 	$('#studentLocationTable').append(formString);
 
 }
@@ -68,48 +75,42 @@ $('#locationbtn').on('click', function(e) {
 	get_location();
 });
 
-// This function gets called when you press the Set Location button
-/*
- * function get_location() { navigator.geolocation.getCurrentPosition(show_map); }
- */
 
 function get_location() {
-	navigator.geolocation.getCurrentPosition(
-			function(position) {
-					location_found(position);
-			},
-			function(er){
-				console.log(er);
-			}
-);
+	if (Modernizr.geolocation) {
+		navigator.geolocation.getCurrentPosition(location_found);
+	} else {
+		console.log("Noe geolocation support");
+	}
 }
 
-// Call this function when you've succesfully obtained the location.
-function location_found(position) {
 
-	// Extract latitude and longitude and save on the server using an AJAX call.
-	// When you've updated the location, call populateStudentTable(json); again
-	// to put the new location next to the student on the page. .
-	var comboBox = document.getElementById("selectedStudent");
-	var user = comboBox.options[comboBox.selectedIndex].value;
-	// ajax
+function location_found(position) {
+	
+	
+	$.getJSON("/assignment2-gui/api/student/" + $("selectedStudent").val() + "/location", function(json) {
+		latitude : position.coords.latitude; 
+		longitude : position.coords.longitude;
+		
+	}, 	function(json) {
+			populateStudentTable(json);
+			console.log(position.coords.latitude);
+			console.log(position.coords.longitude);
+	}
+	);
+	/*
 	$.ajax({
-		url : "http://localhost:8080/assignment2-gui/api/student/" + user
-				+ "/location",
-		type : "GET",
-		data : {
-			latitude : position.coords.latitude,
-			longitude : position.coords.longitude
+		url : "/assignment2-gui/api/student/" + user + "/location",
+		type : "GET", data : { latitude : position.coords.latitude, longitude : position.coords.longitude
 		},
-		success : function(result) {
-			// then call populateStudentTable(json);
-			populateStudentTable(result);
+		success : function(json) {
+			populateStudentTable(json);
 		},
-		error : function(er) {
-			console.log(er);
+		error : function(error) {
+			console.log("error location found");
 		}
 	});
-
+*/
 }
 
 var objectStorage = new Object();
@@ -134,7 +135,6 @@ function initialize_map() {
 		mapTypeId : google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-	// Try HTML5 geolocation
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(function(position) {
 			var pos = new google.maps.LatLng(position.coords.latitude,
@@ -143,11 +143,10 @@ function initialize_map() {
 		}, function() {
 			handleNoGeolocation(true);
 		});
-	} else {
-		// Browser doesn't support Geolocation
-		// Should really tell the user…
 	}
 }
+
+
 
 function handleNoGeolocation(errorFlag) {
 	if (errorFlag) {

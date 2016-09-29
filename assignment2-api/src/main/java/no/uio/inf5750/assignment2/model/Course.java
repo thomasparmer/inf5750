@@ -23,6 +23,7 @@ public class Course {
      */
     private String name;
 
+    @JsonIgnore
     private Set<Student> attendants = new HashSet<Student>();
 
     // -------------------------------------------------------------------------

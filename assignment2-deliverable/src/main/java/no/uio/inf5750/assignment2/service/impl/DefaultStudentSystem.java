@@ -127,7 +127,12 @@ public class DefaultStudentSystem implements StudentSystem {
 
 	@Override
 	public void delStudent(int studentId) {
-		studentDao.delStudent((Student)studentDao.getStudent(studentId));
+		Student s = studentDao.getStudent(studentId);
+		for (Course course : courseDao.getAllCourses()) {
+			course.getAttendants().remove(s);
+		}
+		
+		studentDao.delStudent(s);
 	}
 	
 	@Override
