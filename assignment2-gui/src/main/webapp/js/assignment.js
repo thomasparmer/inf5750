@@ -1,21 +1,29 @@
+
+
 function getStudentData() {
 	// This must be implemented by you. The json variable should be fetched
 	// from the server, not initiated with a static value as below.
 	// You must first download the student json data from the server
 	// then call populateStudentTable(json);
 	// and then populateStudentLocationForm(json);
-	console.log("getStudentData log");
-	$.getJSON("/api/student.json", function(json) {
+	/*$.getJSON("/api/student.json", function(json) {
 		populateStudentTable(json);
 		populateStudentLocationForm(json);
-	});
+	});*/
+	
+	$.ajax({
+		url: '/api/student',
+		type: 'GET',
+		dataType: 'json',
+		success: function (json ){
+		populateStudentTable(json);
+		populateStudentLocationForm(json);
+		}
+		});
 }
 
 function populateStudentTable(json) {
-	//console.log("thomas");
-	console.log(json);
 	$('#studentTable').empty();
-	
 	// for each student make a row in the student location table
 	// and show the name, all courses and location.
 	// if there is no location print "No location" in the <td> instead
@@ -25,32 +33,34 @@ function populateStudentTable(json) {
 
 	// the table can you see in index.jsp with id="studentTable"
 
-	for (var i = 0; i < json.length; i++) {
+	for (var i = 0; i < Object.keys(json).length; i++) {
 		var text = '';
 		var student = json[i];
 		student = explodeJSON(student);
-		console.log("populate student 1");
-		console.log(student + " hello!!! ");
 		text += '<tr><td>' + student.name + '</td><td>';
-        alert(text);
 		
 		for (var j = 0; j < student.courses.length; j++) {
 			var course = student.courses[j];
 			course = explodeJSON(course);
 			text += course.courseCode + " ";
-			alert("22  " + text);
 			
 		}
-		
-		console.log("populate student 2");
+
 		if ( student.latitude != null && student.longitude != null) {
 		text += '</td><td>' + student.latitude + ', ' + student.longitude
 				+ '</td></tr>';
+		var myLatlng = new google.maps.LatLng(student.latitude, student.longitude);                        
+		var marker = new google.maps.Marker({
+		   position: myLatlng,
+		   map: map,
+		   title: student.name
+		});
 		} else {
-			console.log("populate student 3");
 			text += '</td><td>no location</td></tr>';
 		}
 
+		
+		
 		$('#studentTable').append(text);
 	}
 }
@@ -87,20 +97,26 @@ function get_location() {
 
 function location_found(position) {
 	
-	
-	$.getJSON("/assignment2-gui/api/student/" + $("selectedStudent").val() + "/location", function(json) {
+	/*
+	//$.getJSON("/api/student/" + $("selectedStudent").val() + "/location", function(json) {
+		$.getJSON("/api/student/" + "1" + "/location", function(json) {
+			
 		latitude : position.coords.latitude; 
 		longitude : position.coords.longitude;
 		
+		
 	}, 	function(json) {
+			console.log("TEST location ");
 			populateStudentTable(json);
 			console.log(position.coords.latitude);
 			console.log(position.coords.longitude);
 	}
 	);
-	/*
+	
+	*/
+	
 	$.ajax({
-		url : "/assignment2-gui/api/student/" + user + "/location",
+		url : "/api/student/" + document.getElementById("selectedStudent").value + "/location",
 		type : "GET", data : { latitude : position.coords.latitude, longitude : position.coords.longitude
 		},
 		success : function(json) {
@@ -110,7 +126,7 @@ function location_found(position) {
 			console.log("error location found");
 		}
 	});
-*/
+
 }
 
 var objectStorage = new Object();
@@ -118,13 +134,13 @@ var objectStorage = new Object();
 function explodeJSON(object) {
 	if (object instanceof Object == true) {
 		objectStorage[object['@id']] = object;
-		console.log('Object is object');
+		//console.log('Object is object');
 	} else {
 		console.log('Object is not object');
 		object = objectStorage[object];
-		console.log(object);
+		//console.log(object);
 	}
-	console.log(object);
+	//console.log(object);
 	return object;
 }
 

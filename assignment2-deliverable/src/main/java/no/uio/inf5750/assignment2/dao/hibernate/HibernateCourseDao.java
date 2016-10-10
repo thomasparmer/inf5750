@@ -8,8 +8,10 @@ import no.uio.inf5750.assignment2.model.Student;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,12 +37,27 @@ public class HibernateCourseDao implements CourseDAO {
 
 	@Override
 	public Course getCourseByCourseCode(String courseCode) {
-		return (Course) sessionFactory.getCurrentSession().get(Course.class, courseCode);
+		//return (Course) sessionFactory.getCurrentSession().get(Course.class, courseCode);
+		return (Course) sessionFactory.getCurrentSession().createCriteria(Course.class).add(Restrictions.eq("courseCode", courseCode)).uniqueResult();
+		
 	}
 
+	/*
+	@Override
+	public Course getCourseByCourseCode(String courseCode) {
+		//create a query to find a course by his CourseCode
+		Query query= sessionFactory.getCurrentSession().
+	            createQuery("from Course where courseCode=:courseCode");
+	    query.setParameter("courseCode", courseCode);
+	    //collect result 
+	    Course course = (Course) query.uniqueResult();
+	    return course;
+	}*/
+	
 	@Override
 	public Course getCourseByName(String name) {
-		return (Course) sessionFactory.getCurrentSession().get(Course.class, name);
+		//return (Course) sessionFactory.getCurrentSession().get(Course.class, name);
+		return (Course) sessionFactory.getCurrentSession().createCriteria(Course.class).add(Restrictions.eq("name", name)).uniqueResult();
 	}
 
 	@Override

@@ -141,4 +141,6 @@ public class DefaultStudentSystem implements StudentSystem {
 		student.setLatitude(latitude);
 		student.setLongitude(longitude);
 	}
+	
+	
 }

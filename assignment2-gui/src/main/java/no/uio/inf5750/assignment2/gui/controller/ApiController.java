@@ -42,22 +42,28 @@ public class ApiController {
 	    return student;
 	}
 	
-	
+	/*
 	@RequestMapping(value="/student", method = RequestMethod.GET)
 	public String getStudents(ModelMap model) {
 		populateModel(model);
 	     
 		return "api/student";
+	}*/
+	
+	@RequestMapping(value = "/student", method = RequestMethod.GET)
+	@ResponseBody
+	public Collection<Student> student(HttpServletRequest request, HttpServletResponse response ,ModelMap model) {
+		return studentSystem.getAllStudents();
 	}
+
 	
 	@RequestMapping(value = "/course", method = RequestMethod.GET)
-	public String getCourses(ModelMap model) {
-		Collection<Course> courses = studentSystem.getAllCourses();
-		model.addAttribute("courses", courses);
-		return "api/course";
+	public Collection<Course> getCourses(ModelMap model) {
+		return studentSystem.getAllCourses();
+		
 	}
 	
-	private ModelMap populateModel(ModelMap model) {
+	private ModelMap populateModel(HttpServletRequest request, HttpServletResponse response ,ModelMap model) {
 		Collection<Student> students = studentSystem.getAllStudents();
 		model.addAttribute("students", students);
 		Collection<Course> courses = studentSystem.getAllCourses();
